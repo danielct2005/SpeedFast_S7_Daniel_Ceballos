@@ -1,5 +1,6 @@
 package com.speedfast.view;
-import com.speedfast.model.*;
+import com.speedfast.model.Pedido;
+import com.speedfast.dao.PedidoDAO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -9,30 +10,27 @@ public class VentanaListaPedidos extends JFrame {
     private DefaultTableModel modelo;
 
     public VentanaListaPedidos() {
-        setTitle("Lista de Pedidos");
+        setTitle("Pedidos desde Base de Datos");
         setSize(500, 300);
         setLayout(new BorderLayout());
 
-        String[] columnas = {"ID", "Dirección", "Tipo"};
-        modelo = new DefaultTableModel(columnas, 0);
+        modelo = new DefaultTableModel(new String[]{"ID", "Dirección", "Tipo", "Estado"}, 0);
         tabla = new JTable(modelo);
-
-        cargarDatos();
+        cargarDesdeBD();
 
         add(new JScrollPane(tabla), BorderLayout.CENTER);
 
-        JButton btnRefrescar = new JButton("Refrescar");
-        btnRefrescar.addActionListener(e -> cargarDatos());
+        JButton btnRefrescar = new JButton("Actualizar");
+        btnRefrescar.addActionListener(e -> cargarDesdeBD());
         add(btnRefrescar, BorderLayout.SOUTH);
 
         setLocationRelativeTo(null);
     }
 
-    private void cargarDatos() {
-        modelo.setRowCount(0); // Limpiar tabla
-        for (Pedido p : ControladorDatos.getInstance().getListaPedidos()) {
-            Object[] fila = {p.getId(), p.getDireccion(), p.getTipo()};
-            modelo.addRow(fila);
+    private void cargarDesdeBD() {
+        modelo.setRowCount(0);
+        for (Pedido p : new PedidoDAO().listar()) {
+            modelo.addRow(new Object[]{p.getId(), p.getDireccion(), p.getTipo(), p.getEstado()});
         }
     }
 }
